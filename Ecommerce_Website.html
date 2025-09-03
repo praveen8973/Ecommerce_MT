@@ -3,397 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Faulty E-commerce Site for Manual Testing</title>
+    <title>E-commerce Bug Hunt</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; }
-        .page-content {
-            animation: fadeIn 0.5s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .message-box {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="flex flex-col min-h-screen">
 
-    <div id="message-container"></div>
-
-    <header class="bg-white shadow-md p-4 sticky top-0 z-50">
-        <div class="container mx-auto flex justify-between items-center">
-            <a href="#" id="home-link" class="text-2xl font-bold text-teal-600">BuggyBazaar</a>
-            <nav class="flex items-center space-x-4">
-                <button id="cart-link" class="relative">
-                    <svg class="w-8 h-8 text-gray-600" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 1a1 1 0 000 2h1a1 1 0 000 2h10a1 1 0 00.864-.538l3-6a1 1 0 00-.864-1.462H3zm12.652 11.233A2 2 0 1114 15.25a2 2 0 011.652-3.017zm-8 0A2 2 0 116 15.25a2 2 0 011.652-3.017z"></path></svg>
-                    <span id="cart-item-count" class="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/2 -translate-y-1/2 bg-red-600 rounded-full">0</span>
-                </button>
-                <button id="login-link" class="bg-teal-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-teal-600 transition-colors">Login</button>
+    <header class="bg-white shadow-md py-4">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-gray-800">ShopZilla</h1>
+            <nav>
+                <a href="#cart" class="text-gray-600 hover:text-gray-900 transition duration-300 relative">
+                    Cart
+                    <span id="cart-count" class="absolute -top-2 -right-3 bg-red-500 text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">0</span>
+                </a>
             </nav>
         </div>
     </header>
 
-    <main class="container mx-auto my-8 p-4 md:p-8 bg-white rounded-lg shadow-xl min-h-[70vh]">
-        <div id="app-container"></div>
+    <main class="container mx-auto px-6 py-8 flex-grow">
+        <section id="products" class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Our Products</h2>
+            <div id="product-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Product cards will be dynamically added here -->
+            </div>
+        </section>
+
+        <section id="cart" class="mb-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">Your Cart</h2>
+            <div id="cart-items" class="bg-white shadow-lg rounded-lg p-6">
+                <!-- Cart items will be dynamically added here -->
+                <div id="cart-empty-message" class="text-center text-gray-500 italic">Your cart is empty.</div>
+            </div>
+            <div class="flex flex-col sm:flex-row justify-end items-center mt-6 space-y-4 sm:space-y-0 sm:space-x-4">
+                <span id="cart-total-display" class="text-xl font-bold text-gray-800">Total: $0.00</span>
+                <button id="checkout-button" class="bg-blue-500 text-white font-semibold py-3 px-8 rounded-full shadow-lg hover:bg-blue-600 transition duration-300">Checkout</button>
+            </div>
+        </section>
+
+        <!-- Checkout Modal -->
+        <div id="checkout-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+            <div class="bg-white rounded-lg shadow-xl p-8 w-11/12 md:w-1/2 lg:w-1/3">
+                <h3 class="text-2xl font-bold mb-4">Checkout</h3>
+                <form id="checkout-form">
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                        <input type="text" id="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                        <input type="email" id="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="card" class="block text-sm font-medium text-gray-700">Credit Card Number</label>
+                        <input type="text" id="card" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                    </div>
+                    <div class="flex justify-end space-x-4">
+                        <button type="button" id="cancel-checkout" class="py-2 px-4 border border-gray-300 rounded-full text-gray-700 hover:bg-gray-100 transition duration-300">Cancel</button>
+                        <button type="submit" class="bg-green-500 text-white font-semibold py-2 px-6 rounded-full shadow-lg hover:bg-green-600 transition duration-300">Place Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success Message Modal -->
+        <div id="success-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden items-center justify-center">
+            <div class="bg-white rounded-lg shadow-xl p-8 w-11/12 md:w-1/2 lg:w-1/3 text-center">
+                <h3 class="text-2xl font-bold text-green-600 mb-4">Order Placed Successfully!</h3>
+                <p id="order-message" class="text-gray-700 mb-6"></p>
+                <button id="close-success-modal" class="py-2 px-4 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition duration-300">Close</button>
+            </div>
+        </div>
+
     </main>
 
+    <footer class="bg-white shadow-inner mt-8 py-4 text-center text-gray-500 text-sm">
+        <p>&copy; 2023 ShopZilla. All rights reserved.</p>
+    </footer>
+
     <script>
-        const appState = {
-            currentPage: 'home',
-            isLoggedIn: false,
-            cart: [],
-            products: [
-                { id: 1, name: 'Wireless Ergonomic Mouse', price: 49.99, image: 'https://placehold.co/400x400/FFF/34D399?text=Mouse', description: 'A comfortable and silent wireless mouse for long work hours.' },
-                { id: 2, name: 'Mechanical Keyboard', price: 129.50, image: 'https://placehold.co/400x400/FFF/34D399?text=Keyboard', description: 'Clicky keys, RGB backlighting, and a satisfying typing experience.' },
-                { id: 3, name: '4K Ultra HD Monitor', price: 299.00, image: 'https://placehold.co/400x400/FFF/34D399?text=Monitor', description: 'Stunning visuals and incredible detail for work and gaming.' },
-                { id: 4, name: 'Noise-Cancelling Headphones', price: 199.00, image: 'https://placehold.co/400x400/FFF/34D399?text=Headphones', description: 'Tune out the world with crystal-clear audio and deep bass.' },
-                { id: 5, name: 'Portable SSD 1TB', price: 89.00, image: 'https://placehold.co/400x400/FFF/34D399?text=SSD', description: 'Blazing fast storage in a compact, durable design.' },
-                { id: 6, name: 'Webcam 1080p HD', price: 59.99, image: 'https://placehold.co/400x400/FFF/34D399?text=Webcam', description: 'High-definition video for professional-quality video calls.' },
-                { id: 7, name: 'Laptop Stand', price: 25.00, image: 'https://placehold.co/400x400/FFF/34D399?text=Stand', description: 'Improve posture and airflow with this sturdy aluminum laptop stand.' },
-                { id: 8, name: 'USB-C Hub', price: 35.00, image: 'https://placehold.co/400x400/FFF/34D399?text=Hub', description: 'Expand your laptop\'s connectivity with multiple ports.' }
-            ]
-        };
+        const products = [
+            { id: 1, name: "Stylish Headphones", price: 75.00, image: "https://placehold.co/200x200/4c4c4c/ffffff?text=Headphones" },
+            { id: 2, name: "Vintage Camera", price: 120.00, image: "https://placehold.co/200x200/5a67d8/ffffff?text=Camera" },
+            { id: 3, name: "Smart Watch", price: 150.00, image: "https://placehold.co/200x200/4299e1/ffffff?text=Watch" },
+            { id: 4, name: "Portable Speaker", price: 50.00, image: "https://placehold.co/200x200/667eea/ffffff?text=Speaker" },
+            { id: 5, name: "Wireless Keyboard", price: 80.00, image: "https://placehold.co/200x200/8b5cf6/ffffff?text=Keyboard" },
+            { id: 6, name: "Gaming Mouse", price: 45.00, image: "https://placehold.co/200x200/9333ea/ffffff?text=Mouse" },
+            { id: 7, name: "Desk Lamp", price: 30.00, image: "https://placehold.co/200x200/38b2ac/ffffff?text=Lamp" },
+            { id: 8, name: "Notebook", price: 15.00, image: "https://placehold.co/200x200/3182ce/ffffff?text=Notebook" },
+        ];
 
-        const appContainer = document.getElementById('app-container');
-        const cartItemCount = document.getElementById('cart-item-count');
-        const messageContainer = document.getElementById('message-container');
+        let cart = {};
 
-        const showMessage = (text, type = 'success') => {
-            const messageBox = document.createElement('div');
-            messageBox.className = `message-box px-6 py-3 rounded-lg shadow-lg text-white font-semibold ${type === 'success' ? 'bg-teal-500' : 'bg-red-500'}`;
-            messageBox.textContent = text;
-            messageContainer.appendChild(messageBox);
-            setTimeout(() => messageBox.remove(), 3000);
-        };
+        const productListEl = document.getElementById('product-list');
+        const cartItemsEl = document.getElementById('cart-items');
+        const cartCountEl = document.getElementById('cart-count');
+        const cartTotalEl = document.getElementById('cart-total-display');
+        const cartEmptyMessageEl = document.getElementById('cart-empty-message');
+        const checkoutButton = document.getElementById('checkout-button');
+        const checkoutModal = document.getElementById('checkout-modal');
+        const successModal = document.getElementById('success-modal');
+        const checkoutForm = document.getElementById('checkout-form');
+        const cancelCheckoutBtn = document.getElementById('cancel-checkout');
+        const closeSuccessModalBtn = document.getElementById('close-success-modal');
 
-        const renderPage = (pageName) => {
-            appState.currentPage = pageName;
-            switch (pageName) {
-                case 'home':
-                    renderProductGrid();
-                    break;
-                case 'cart':
-                    renderCart();
-                    break;
-                case 'checkout':
-                    renderCheckout();
-                    break;
-                case 'login':
-                    renderAuth('login');
-                    break;
-                case 'register':
-                    renderAuth('register');
-                    break;
-                case 'order-success':
-                    renderOrderSuccess();
-                    break;
-            }
-        };
-
-        const updateCartCount = () => {
-            cartItemCount.textContent = appState.cart.reduce((sum, item) => sum + item.quantity, 0);
-        };
-
-        const renderAuth = (type) => {
-            const isLogin = type === 'login';
-            appContainer.innerHTML = `
-                <div class="page-content max-w-md mx-auto bg-gray-50 p-8 rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold mb-6 text-center text-teal-600">${isLogin ? 'Login' : 'Register'}</h2>
-                    <form id="${type}-form" class="space-y-4">
-                        <div>
-                            <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
-                            <input type="text" id="username" name="username" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-300 focus:ring focus:ring-teal-200 focus:ring-opacity-50 p-2" required>
-                        </div>
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                            <input type="password" id="password" name="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-300 focus:ring focus:ring-teal-200 focus:ring-opacity-50 p-2" required>
-                        </div>
-                        ${!isLogin ? `
-                        <div>
-                            <label for="confirm-password" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                            <input type="password" id="confirm-password" name="confirm-password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-300 focus:ring focus:ring-teal-200 focus:ring-opacity-50 p-2" required>
-                        </div>
-                        ` : ''}
-                        <button type="submit" class="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
-                            ${isLogin ? 'Login' : 'Register'}
-                        </button>
-                    </form>
-                    <p class="mt-4 text-center text-sm text-gray-600">
-                        ${isLogin ? `
-                        Don't have an account? <a href="#" id="go-to-register" class="font-medium text-teal-600 hover:text-teal-500">Register here</a>
-                        ` : `
-                        Already have an account? <a href="#" id="go-to-login" class="font-medium text-teal-600 hover:text-teal-500">Login here</a>
-                        `}
-                    </p>
-                </div>
-            `;
-
-            document.getElementById(`${type}-form`).addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = e.target.username.value;
-                const password = e.target.password.value;
-                if (isLogin) {
-                    if (username === 'testuser') { // BUG: Login works with correct username but any password
-                        appState.isLoggedIn = true;
-                        showMessage('Login successful!');
-                        renderPage('home');
-                        document.getElementById('login-link').textContent = 'Logout';
-                    } else {
-                        showMessage('Invalid credentials.', 'error');
-                    }
-                } else {
-                    const confirmPassword = e.target['confirm-password'].value;
-                    if (password !== confirmPassword) { // BUG: Confirm password does not correctly block registration
-                        showMessage('Passwords do not match.', 'error');
-                    }
-                    appState.isLoggedIn = true;
-                    showMessage('Registration successful!');
-                    renderPage('home');
-                    document.getElementById('login-link').textContent = 'Logout';
-                }
-            });
-
-            document.getElementById('go-to-login')?.addEventListener('click', () => renderPage('login'));
-            document.getElementById('go-to-register')?.addEventListener('click', () => renderPage('register'));
-        };
-
-        const renderProductGrid = () => {
-            const productCards = appState.products.map(product => `
-                <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col items-center p-4">
-                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover rounded-md mb-4">
-                    <h3 class="text-xl font-bold text-center text-gray-900 mb-2">${product.name}</h3>
-                    <p class="text-gray-600 mb-4 text-center">${product.description}</p>
-                    <span class="text-2xl font-bold text-teal-600 mb-4">$${product.price.toFixed(2)}</span>
-                    <button class="add-to-cart-btn bg-teal-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-teal-600 transition-colors w-full" data-id="${product.id}">Add to Cart</button>
-                </div>
-            `).join('');
-
-            appContainer.innerHTML = `
-                <div class="page-content">
-                    <h2 class="text-3xl font-bold text-center text-teal-600 mb-8">Our Products</h2>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                        ${productCards}
+        // Render products on the page
+        function renderProducts() {
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'bg-white shadow-lg rounded-lg overflow-hidden flex flex-col items-center p-4';
+                productCard.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover mb-4 rounded-lg">
+                    <div class="flex-grow text-center">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-1">${product.name}</h3>
+                        <p class="text-gray-600 mb-4">$${product.price.toFixed(2)}</p>
                     </div>
-                </div>
-            `;
-
-            document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const productId = parseInt(e.target.dataset.id);
-                    const existingItem = appState.cart.find(item => item.id === productId);
-                    if (existingItem) {
-                        existingItem.quantity += 1;
-                    } else {
-                        const productToAdd = appState.products.find(p => p.id === productId);
-                        appState.cart.push({ ...productToAdd, quantity: 1 });
-                    }
-                    updateCartCount();
-                    showMessage(`${appState.products.find(p => p.id === productId).name} added to cart.`);
-                });
-            });
-        };
-
-        const renderCart = () => {
-            let total = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            if (total === 0) {
-                appContainer.innerHTML = `
-                    <div class="page-content text-center">
-                        <h2 class="text-3xl font-bold text-teal-600 mb-4">Your Shopping Cart</h2>
-                        <p class="text-gray-600">Your cart is empty.</p>
-                        <button id="back-to-home" class="mt-6 bg-teal-500 text-white px-6 py-2 rounded-lg font-semibold">Continue Shopping</button>
-                    </div>
+                    <button data-id="${product.id}" class="add-to-cart-btn bg-green-500 text-white font-semibold py-2 px-6 rounded-full hover:bg-green-600 transition duration-300 self-end">Add to Cart</button>
                 `;
-                document.getElementById('back-to-home').addEventListener('click', () => renderPage('home'));
-                return;
+                productListEl.appendChild(productCard);
+            });
+        }
+
+        // Add to cart functionality
+        productListEl.addEventListener('click', (e) => {
+            if (e.target.classList.contains('add-to-cart-btn')) {
+                const productId = parseInt(e.target.dataset.id);
+                const productToAdd = products.find(p => p.id === productId);
+
+                if (cart[productId]) {
+                    cart[productId].quantity++;
+                } else {
+                    cart[productId] = { ...productToAdd, quantity: 1 };
+                }
+                updateCartUI();
             }
-
-            const cartItemsHtml = appState.cart.map(item => `
-                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm mb-4">
-                    <div class="flex items-center space-x-4">
-                        <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-md">
-                        <div>
-                            <p class="font-semibold text-gray-900">${item.name}</p>
-                            <p class="text-gray-600">$${item.price.toFixed(2)}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <button class="update-quantity-btn px-2 py-1 text-gray-500 hover:text-gray-700" data-id="${item.id}" data-action="minus">-</button>
-                        <span class="w-8 text-center">${item.quantity}</span>
-                        <button class="update-quantity-btn px-2 py-1 text-gray-500 hover:text-gray-700" data-id="${item.id}" data-action="plus">+</button>
-                        <button class="remove-item-btn ml-4 text-red-500 hover:text-red-700" data-id="${item.id}">Remove</button>
-                    </div>
-                    <p class="font-semibold text-gray-900">$${(item.price * item.quantity).toFixed(2)}</p>
-                </div>
-            `).join('');
-
-            appContainer.innerHTML = `
-                <div class="page-content">
-                    <h2 class="text-3xl font-bold text-teal-600 mb-4">Your Shopping Cart</h2>
-                    <div>${cartItemsHtml}</div>
-                    <div class="flex justify-between items-center mt-6">
-                        <div class="flex space-x-2">
-                            <input type="text" id="discount-code" placeholder="Discount Code" class="rounded-md border-gray-300 p-2">
-                            <button id="apply-discount-btn" class="bg-gray-300 text-gray-800 px-4 rounded-md">Apply</button>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-xl font-semibold">Total: <span id="cart-total">$${total.toFixed(2)}</span></p>
-                            <button id="checkout-btn" class="mt-4 bg-teal-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-teal-700 transition-colors">Proceed to Checkout</button>
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            document.getElementById('apply-discount-btn').addEventListener('click', () => {
-                const code = document.getElementById('discount-code').value;
-                if (code === 'TEST20') { // BUG: Discount code doesn't apply correctly
-                    showMessage('Discount code applied!');
-                } else {
-                    showMessage('Invalid discount code.', 'error');
-                }
-            });
-
-            document.querySelectorAll('.update-quantity-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const id = parseInt(e.target.dataset.id);
-                    const action = e.target.dataset.action;
-                    const item = appState.cart.find(i => i.id === id);
-                    if (item) {
-                        if (action === 'plus') {
-                            item.quantity++;
-                        } else if (action === 'minus' && item.quantity > 1) {
-                            item.quantity--;
-                        }
-                    }
-                    renderCart();
-                    updateCartCount();
-                });
-            });
-
-            document.querySelectorAll('.remove-item-btn').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const id = parseInt(e.target.dataset.id);
-                    appState.cart = appState.cart.filter(item => item.id !== id);
-                    renderCart();
-                    updateCartCount();
-                });
-            });
-
-            document.getElementById('checkout-btn').addEventListener('click', () => {
-                if (!appState.isLoggedIn) {
-                    showMessage('You must be logged in to checkout.', 'error');
-                    renderPage('login');
-                } else {
-                    renderPage('checkout');
-                }
-            });
-        };
-
-        const renderCheckout = () => {
-            const total = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            appContainer.innerHTML = `
-                <div class="page-content max-w-2xl mx-auto">
-                    <h2 class="text-3xl font-bold text-teal-600 mb-6">Checkout</h2>
-                    <div class="bg-gray-50 p-6 rounded-lg shadow-md mb-6">
-                        <h3 class="text-xl font-semibold mb-4">Order Summary</h3>
-                        <div class="space-y-2">
-                            ${appState.cart.map(item => `
-                                <div class="flex justify-between items-center text-gray-700">
-                                    <span>${item.name} x ${item.quantity}</span>
-                                    <span>$${(item.price * item.quantity).toFixed(2)}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <div class="border-t border-gray-300 pt-4 mt-4 flex justify-between items-center text-xl font-bold text-gray-900">
-                            <span>Total</span>
-                            <span>$${total.toFixed(2)}</span>
-                        </div>
-                    </div>
-                    <form id="checkout-form" class="space-y-6">
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Shipping Information</h3>
-                            <input type="text" id="name" placeholder="Full Name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
-                            <input type="text" id="address" placeholder="Address" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
-                            <div class="grid grid-cols-2 gap-4 mt-1">
-                                <input type="text" id="city" placeholder="City" class="block w-full rounded-md border-gray-300 shadow-sm p-2" required>
-                                <input type="text" id="zip" placeholder="Zip Code" class="block w-full rounded-md border-gray-300 shadow-sm p-2">
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">Payment Details</h3>
-                            <input type="text" id="card-number" placeholder="Card Number" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2" required>
-                            <div class="grid grid-cols-2 gap-4 mt-1">
-                                <input type="text" id="expiry" placeholder="MM/YY" class="block w-full rounded-md border-gray-300 shadow-sm p-2" required>
-                                <input type="text" id="cvv" placeholder="CVV" class="block w-full rounded-md border-gray-300 shadow-sm p-2" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="w-full py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-teal-600 hover:bg-teal-700">Place Order</button>
-                    </form>
-                </div>
-            `;
-
-            document.getElementById('checkout-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const zip = document.getElementById('zip').value;
-                if (!/^\d{5}$/.test(zip)) { // BUG: Zip code validation is client-side only and can be bypassed
-                    // This is a correct check but a bug exists because it doesn't prevent a server-side bug
-                }
-                const cardNumber = document.getElementById('card-number').value;
-                if (cardNumber.length === 16 && !isNaN(cardNumber)) { // BUG: Fake validation
-                    showMessage('Payment processing...', 'success');
-                    setTimeout(() => {
-                        renderPage('order-success');
-                    }, 2000);
-                } else {
-                    showMessage('Invalid card details. Please try again.', 'error');
-                }
-            });
-        };
-
-        const renderOrderSuccess = () => {
-            const finalTotal = appState.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-            appContainer.innerHTML = `
-                <div class="page-content text-center max-w-md mx-auto p-8 bg-green-50 rounded-lg shadow-md border border-green-200">
-                    <svg class="w-16 h-16 mx-auto text-green-600 mb-4" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
-                    <h2 class="text-3xl font-bold text-green-700 mb-2">Order Confirmed!</h2>
-                    <p class="text-lg text-gray-700">Thank you for your purchase.</p>
-                    <p class="text-xl font-semibold mt-4">Order #: 000000</p>
-                    <p class="text-gray-600">Total Charged: $${finalTotal.toFixed(2)}</p>
-                    <button id="back-to-home" class="mt-6 bg-teal-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-teal-600 transition-colors">Continue Shopping</button>
-                </div>
-            `;
-            appState.cart = [];
-            updateCartCount();
-            document.getElementById('back-to-home').addEventListener('click', () => renderPage('home'));
-        };
-
-        document.getElementById('home-link').addEventListener('click', (e) => {
-            e.preventDefault();
-            renderPage('home');
         });
-        document.getElementById('cart-link').addEventListener('click', (e) => {
-            e.preventDefault();
-            renderPage('cart');
-        });
-        document.getElementById('login-link').addEventListener('click', (e) => {
-            e.preventDefault();
-            if (appState.isLoggedIn) {
-                appState.isLoggedIn = false;
-                document.getElementById('login-link').textContent = 'Login';
-                showMessage('Logged out successfully.');
-                renderPage('home');
+
+        // Update cart UI
+        function updateCartUI() {
+            cartItemsEl.innerHTML = '';
+            let total = 0;
+            let totalItems = 0;
+
+            if (Object.keys(cart).length === 0) {
+                cartEmptyMessageEl.style.display = 'block';
             } else {
-                renderPage('login');
+                cartEmptyMessageEl.style.display = 'none';
+                for (const productId in cart) {
+                    const item = cart[productId];
+                    const itemTotal = item.price * item.quantity;
+                    total += itemTotal;
+                    totalItems += item.quantity;
+
+                    const cartItemEl = document.createElement('div');
+                    cartItemEl.className = 'flex items-center justify-between p-4 mb-2 bg-gray-100 rounded-lg';
+                    cartItemEl.innerHTML = `
+                        <div class="flex items-center">
+                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 rounded-lg mr-4">
+                            <div>
+                                <h4 class="font-semibold">${item.name}</h4>
+                                <p class="text-gray-600">$${item.price.toFixed(2)}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <span class="text-lg font-medium">x${item.quantity}</span>
+                            <button data-id="${item.id}" class="remove-from-cart-btn text-red-500 hover:text-red-700 transition duration-300 font-bold">Remove</button>
+                        </div>
+                    `;
+                    cartItemsEl.appendChild(cartItemEl);
+                }
+            }
+            cartCountEl.textContent = totalItems;
+            cartTotalEl.textContent = `Total: $${total.toFixed(2)}`;
+        }
+
+        // Remove from cart functionality
+        cartItemsEl.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-from-cart-btn')) {
+                const productId = parseInt(e.target.dataset.id);
+                delete cart[productId];
+                updateCartUI();
             }
         });
 
-        renderPage('home');
+        // Checkout button click
+        checkoutButton.addEventListener('click', () => {
+            if (Object.keys(cart).length > 0) {
+                checkoutModal.style.display = 'flex';
+            } else {
+                // Bug: This should show a message instead of doing nothing
+            }
+        });
+
+        // Cancel checkout
+        cancelCheckoutBtn.addEventListener('click', () => {
+            checkoutModal.style.display = 'none';
+        });
+
+        // Checkout form submission
+        checkoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const card = document.getElementById('card').value;
+
+            // Bug: No validation is performed on the input fields
+            if (card.length === 16 && !isNaN(card)) {
+                // Bug: Always successful, regardless of input
+                checkoutModal.style.display = 'none';
+                successModal.style.display = 'flex';
+                document.getElementById('order-message').textContent = `Thank you, ${name}! Your order is being processed.`;
+                
+                // Clear the cart
+                cart = {};
+                updateCartUI();
+            } else {
+                // Bug: This path is not reachable due to lack of validation
+            }
+        });
+
+        // Close success modal
+        closeSuccessModalBtn.addEventListener('click', () => {
+            successModal.style.display = 'none';
+            // Bug: Page does not refresh or redirect after closing modal
+        });
+        
+        // Initial rendering
+        renderProducts();
+        updateCartUI();
     </script>
+
 </body>
 </html>
